@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saidul Ali Mallick - Research Portfolio</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header & Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300" id="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold tracking-wider opacity-0" id="nav-title">
+                <a href="#">RESEARCH of SAMI</a>
+            </div>
+            <div class="flex items-center space-x-6 opacity-0" id="nav-links">
+                <a href="/" class="hover:text-[var(--accent-color)] transition-colors duration-300">Home</a>
+                <a href="https://saidulalimallick.pages.dev" class="hover:text-[var(--accent-color)] transition-colors duration-300">Portfolio</a>
+                <a href="#footer-section" class="hover:text-[var(--accent-color)] transition-colors duration-300">About</a>
+                <button id="theme-toggle" class="text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--border-color)] transition-colors duration-300">
+                    <i class="fas fa-moon theme-icon"></i>
+                    <i class="fas fa-sun theme-icon"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 pt-32 pb-12">
+        <!-- Search Hero Section -->
+        <section class="text-center my-12 md:my-20 opacity-0" id="search-section">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Exploring Ideas, Shaping Futures.</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto" style="color: var(--subtext-color);">
+                A curated collection of my research in political science and modern education.
+            </p>
+            <div class="relative max-w-2xl mx-auto">
+                <i class="fas fa-search absolute top-1/2 left-5 -translate-y-1/2" style="color: var(--subtext-color);"></i>
+                <input type="text" id="search-bar" placeholder="Search research by name, topic, or year..."
+                       class="search-bar w-full py-4 pl-12 pr-4 rounded-full outline-none text-lg">
+            </div>
+        </section>
+
+        <!-- No Results Message -->
+        <div id="no-results" class="text-center py-12 hidden">
+             <i class="fas fa-search-minus fa-3x mb-4" style="color: var(--subtext-color);"></i>
+             <h3 class="text-2xl font-semibold">No Results Found</h3>
+             <p style="color: var(--subtext-color);">Try adjusting your search terms.</p>
+        </div>
+
+        <!-- Research Sections -->
+        <div id="research-container">
+            <!-- Political Research Section -->
+            <section id="political-research" class="mb-20">
+                <h2 class="section-title text-3xl font-bold mb-8 border-l-4 pl-4" style="border-color: var(--accent-color);">Political Research</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 research-grid">
+                    <!-- Cards will be injected here -->
+                </div>
+            </section>
+
+            <!-- Educational Research Section -->
+            <section id="educational-research">
+                <h2 class="section-title text-3xl font-bold mb-8 border-l-4 pl-4" style="border-color: var(--accent-color);">Educational Research</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 research-grid">
+                    <!-- Cards will be injected here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer-section" class="text-center py-8 mt-12 border-t" style="border-color: var(--border-color); color: var(--subtext-color);">
+        <p class="opacity-0" id="footer-text">&copy; 2025 saidulalimallick04. All rights reserved.</p>
+        <p class="text-sm mt-2 opacity-0" id="footer-disclaimer">The views and opinions expressed in these works are my own and do not intend to harm or malign any individual, group, or organization.</p>
+    </footer>
+
+    <!-- JavaScript for Logic & Animations -->
+    <script src="research-data.js"></script>
+    <script src="assets/script.js"></script>
+    
+</body>
+</html>
+

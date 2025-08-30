@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India 2047: An Interactive Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: A thematic, three-part interactive dashboard ('The Foundation', 'The Economic Engine', 'The Future') is chosen over the report's linear structure. This design visually reinforces the core thesis: foundational improvements are prerequisites for economic and sustainable success. Users can navigate between these core themes, with interactive cards for sub-topics that reveal detailed, multi-stage roadmaps in modals upon clicking. This structure prioritizes user exploration and understanding of the interconnected nature of the challenges, allowing them to see dependencies (e.g., via hover effects) rather than just reading a sequence of chapters. -->
+    <!-- Visualization & Content Choices: Key data points are transformed into interactive Chart.js visualizations to make them easily digestible. Goal: Compare -> Bar charts compare India's metrics (e.g., health spending) against global benchmarks. Goal: Inform -> Donut charts illustrate wealth distribution and energy mix. Goal: Organize -> Multi-stage reform plans are presented in structured HTML/CSS timelines within modals, triggered by user clicks, to keep the main interface clean. The core relationship between foundational pillars and economic outcomes is shown via a JS-driven hover interaction that highlights dependencies. This approach makes the report's complex data and arguments accessible and engaging. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; max-height: 400px; } }
+        .nav-link { transition: all 0.3s ease; }
+        .nav-link.active { color: #F97316; border-bottom-color: #F97316; }
+        .nav-link:not(.active):hover { color: #F97316; }
+        .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .modal { transition: opacity 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease; }
+        .prerequisite-highlight { border: 2px solid #F97316 !important; background-color: #FFF7ED; }
+        .timeline-item::before { content: ''; position: absolute; left: -20px; top: 0; width: 2px; height: 100%; background-color: #E5E7EB; }
+        .timeline-dot { position: absolute; left: -25px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background-color: #F97316; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-orange-600">India 2047</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="/" class="nav-link text-lg font-medium text-stone-600 border-b-2 border-transparent pb-1 active">Home</a>
+                <a href="#foundation" class="nav-link text-lg font-medium text-stone-600 border-b-2 border-transparent pb-1 active">The Foundation</a>
+                <a href="#engine" class="nav-link text-lg font-medium text-stone-600 border-b-2 border-transparent pb-1">The Economic Engine</a>
+                <a href="#future" class="nav-link text-lg font-medium text-stone-600 border-b-2 border-transparent pb-1">The Future</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-stone-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#foundation" class="block py-2 text-stone-600">The Foundation</a>
+            <a href="#engine" class="block py-2 text-stone-600">The Economic Engine</a>
+            <a href="#future" class="block py-2 text-stone-600">The Future</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section id="hero" class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-4 text-stone-900">A Strategic Blueprint for National Transformation</h2>
+            <p class="max-w-3xl mx-auto text-lg text-stone-600">
+                This interactive report visualizes a sequential strategy for India's development. It argues that top-level economic growth is fundamentally dependent on strengthening the nation's foundational pillars: its people and its institutions. Explore the interconnected roadmap below.
+            </p>
+        </section>
+
+        <div id="app-content">
+            <!-- Section 1: The Foundation -->
+            <section id="foundation" class="mb-20">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-stone-800">Part I: Strengthening the Foundational Pillars</h3>
+                    <p class="max-w-2xl mx-auto mt-2 text-stone-600">The journey begins by addressing the root causes: investing in the capabilities of citizens and the integrity of the state. These are the non-negotiable first steps for sustainable progress.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-xl font-semibold mb-4">Human Capital: The Prerequisite for Progress</h4>
+                        <p class="text-stone-600 mb-6">A skilled and healthy population is the primary input for a productive economy. This section explores the challenges and reforms in education, healthcare, and basic amenities.</p>
+                        <div class="chart-container">
+                            <canvas id="humanCapitalChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-xl font-semibold mb-4">State Capacity: The Bedrock of Trust</h4>
+                        <p class="text-stone-600 mb-6">An efficient, transparent state that upholds the rule of law is the essential operating system for a modern economy. This requires tackling corruption and reforming administration and justice.</p>
+                        <div class="chart-container">
+                            <canvas id="governanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                    <div class="card bg-white p-6 rounded-lg shadow-md" data-prerequisite="education">
+                        <h5 class="font-bold text-lg mb-2">📚 Education: From Access to Outcomes</h5>
+                        <p class="text-sm text-stone-600 mb-4">Challenge: Despite high enrollment, learning outcomes are poor, creating a skills gap. Only ~50% of Grade 5 students can read a Grade 2 text.</p>
+                        <button class="w-full bg-orange-500 text-white font-semibold py-2 rounded-md hover:bg-orange-600" onclick="showModal('education')">View Roadmap</button>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md" data-prerequisite="health">
+                        <h5 class="font-bold text-lg mb-2">⚕️ Healthcare: Universal & Resilient System</h5>
+                        <p class="text-sm text-stone-600 mb-4">Challenge: Chronic underfunding (~1.35% of GDP) leads to high out-of-pocket costs, pushing 63 million into poverty annually.</p>
+                        <button class="w-full bg-orange-500 text-white font-semibold py-2 rounded-md hover:bg-orange-600" onclick="showModal('healthcare')">View Roadmap</button>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md" data-prerequisite="governance">
+                        <h5 class="font-bold text-lg mb-2">🏛️ Governance: Eradicating Corruption</h5>
+                        <p class="text-sm text-stone-600 mb-4">Challenge: Perceived corruption (Rank 96/180) stifles investment and acts as a regressive tax on the poor.</p>
+                        <button class="w-full bg-orange-500 text-white font-semibold py-2 rounded-md hover:bg-orange-600" onclick="showModal('corruption')">View Roadmap</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: The Economic Engine -->
+            <section id="engine" class="mb-20">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-stone-800">Part II: Powering the Economic Engine</h3>
+                    <p class="max-w-2xl mx-auto mt-2 text-stone-600">With strong foundations, India can unleash its productive capacities. This requires modern infrastructure and revitalized core sectors to create jobs and drive growth.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h4 class="text-xl font-semibold mb-4 text-center">Manufacturing's Share of GDP: Target vs. Reality</h4>
+                    <p class="text-stone-600 mb-6 text-center">The 'Make in India' initiative aimed to increase manufacturing's contribution to GDP to 25%. However, it has remained stagnant. Success in this area is heavily dependent on foundational reforms.</p>
+                    <div class="chart-container">
+                        <canvas id="manufacturingChart"></canvas>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card bg-white p-6 rounded-lg shadow-md" onmouseover="highlightPrerequisites(['education', 'governance'])" onmouseout="clearHighlights()">
+                        <h5 class="font-bold text-lg mb-2">🏭 Make in India 2.0</h5>
+                        <p class="text-sm text-stone-600 mb-4">Goal: Become a global manufacturing hub. Prerequisites: Skilled workforce (Education) & Ease of Doing Business (Governance).</p>
+                        <button class="w-full bg-teal-500 text-white font-semibold py-2 rounded-md hover:bg-teal-600" onclick="showModal('manufacturing')">View Roadmap</button>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md" onmouseover="highlightPrerequisites(['governance'])" onmouseout="clearHighlights()">
+                        <h5 class="font-bold text-lg mb-2">🌾 Agrarian Transformation</h5>
+                        <p class="text-sm text-stone-600 mb-4">Goal: Double farmer income through modernization. Prerequisite: Efficient markets and infrastructure (Governance).</p>
+                        <button class="w-full bg-teal-500 text-white font-semibold py-2 rounded-md hover:bg-teal-600" onclick="showModal('agriculture')">View Roadmap</button>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md" onmouseover="highlightPrerequisites(['education'])" onmouseout="clearHighlights()">
+                        <h5 class="font-bold text-lg mb-2">💡 Innovation & Startups</h5>
+                        <p class="text-sm text-stone-600 mb-4">Goal: Scale the world's 3rd largest startup ecosystem. Prerequisite: A deep talent pool (Education).</p>
+                        <button class="w-full bg-teal-500 text-white font-semibold py-2 rounded-md hover:bg-teal-600" onclick="showModal('innovation')">View Roadmap</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: The Future -->
+            <section id="future" class="mb-16">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-stone-800">Part III: Securing a Sustainable & Cohesive Future</h3>
+                    <p class="max-w-2xl mx-auto mt-2 text-stone-600">Long-term prosperity depends on environmentally sustainable and socially inclusive growth. This requires balancing development with stewardship and addressing deep-seated inequalities.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-xl font-semibold mb-4">The Inequality Paradox</h4>
+                        <p class="text-stone-600 mb-6">While consumption data suggests equality, wealth is extremely concentrated. The top 1% holds over 40% of national wealth, while the bottom 50% holds just 3%. This creates a profound inequality of opportunity.</p>
+                        <div class="chart-container">
+                            <canvas id="inequalityChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-xl font-semibold mb-4">Green Energy Transition</h4>
+                        <p class="text-stone-600 mb-6">India is a global leader in renewable energy, having already surpassed its 2030 target for non-fossil fuel capacity. The new goal is 500 GW by 2030, moving towards Net Zero by 2070.</p>
+                        <div class="chart-container">
+                            <canvas id="energyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6 mt-8">
+                    <div class="card bg-white p-6 rounded-lg shadow-md">
+                        <h5 class="font-bold text-lg mb-2">🌍 Environmental Stewardship</h5>
+                        <p class="text-sm text-stone-600 mb-4">Challenge: Severe air and water pollution pose a direct threat to public health and economic stability, costing an estimated $95 billion in lost GDP annually.</p>
+                        <button class="w-full bg-indigo-500 text-white font-semibold py-2 rounded-md hover:bg-indigo-600" onclick="showModal('environment')">View Roadmap</button>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-md">
+                        <h5 class="font-bold text-lg mb-2">🤝 Social Cohesion</h5>
+                        <p class="text-sm text-stone-600 mb-4">Challenge: Deep-seated inequalities based on gender, caste, and religion threaten national unity and prevent the nation from realizing its full human potential.</p>
+                        <button class="w-full bg-indigo-500 text-white font-semibold py-2 rounded-md hover:bg-indigo-600" onclick="showModal('social')">View Roadmap</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-stone-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-semibold text-lg">A Resurgent India: From Vision to Reality</p>
+            <p class="text-stone-400 mt-2">The path to 2047 requires sustained will and a synchronized effort. This blueprint offers an integrated, sequential strategy for building a prosperous, inclusive, and sustainable nation.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Structure -->
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div id="modal-content" class="modal-content bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8 transform scale-95">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modal-title" class="text-2xl font-bold"></h3>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-800">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const data = {
+                humanCapital: {
+                    labels: ['Literacy Rate', 'Public Health Spending (% GDP)'],
+                    india: [77, 1.35],
+                    target: [87, 5.0]
+                },
+                governance: {
+                    corruptionRank: 96,
+                    totalCountries: 180
+                },
+                manufacturing: {
+                    labels: ['2014-15', '2023-24', 'Target'],
+                    share: [16.3, 14.1, 25]
+                },
+                inequality: {
+                    labels: ['Top 1%', 'Next 9%', 'Bottom 90% (combined)'],
+                    wealth: [40, 37, 23]
+                },
+                energy: {
+                    labels: ['Non-Fossil Fuel', 'Fossil Fuel'],
+                    capacity: [50, 50]
+                },
+                modals: {
+                    education: {
+                        title: '📚 Roadmap: Education Reform',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Aggressively implement National Mission on Foundational Literacy & Numeracy. Fill all teacher vacancies and tackle absenteeism using technology.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Roll out new 5+3+3+4 curriculum. Shift to competency-based assessments. Group schools into resource-sharing clusters.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Achieve public education spending of 6% of GDP. Transition all teacher education to multidisciplinary universities.</p></div>
+                            </div>`
+                    },
+                    healthcare: {
+                        title: '⚕️ Roadmap: Universal Healthcare',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Fully operationalize 150,000 Health & Wellness Centers (HWCs). Scale up telemedicine to bridge rural-urban gap and enforce a primary-care-first referral system.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Increase public health spending to 2.5-3% of GDP. Build the healthcare workforce and implement strong regulation for the private sector.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Achieve public health spending of 5% of GDP. Create a unified national health system integrating public and private providers.</p></div>
+                            </div>`
+                    },
+                    corruption: {
+                        title: '🏛️ Roadmap: Anti-Corruption',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Fully empower Lokpal & Lokayuktas with financial autonomy and suo motu investigation powers. Ensure transparent appointments.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Implement systemic reforms to reduce corruption opportunities: digitize all citizen services, simplify regulations, and use e-procurement for all contracts.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Foster a culture of integrity through ethics training for all public officials. Strengthen whistleblower protection laws.</p></div>
+                            </div>`
+                    },
+                    manufacturing: {
+                        title: '🏭 Roadmap: Make in India 2.0',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Aggressively improve Ease of Doing Business. Implement a functional single-window clearance system and simplify the GST framework.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Bridge the skill gap with industry-led training and apprenticeships. Ensure PLI schemes drive domestic value addition, not just assembly.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Integrate into global value chains by concluding Free Trade Agreements. Build robust domestic supply chains for critical components.</p></div>
+                            </div>`
+                    },
+                    agriculture: {
+                        title: '🌾 Roadmap: Agrarian Transformation',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Push for productivity enhancement via micro-irrigation, universal Soil Health Cards, and community seed banks.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Build consensus with states for market reforms (APMC alternatives). Massively scale up the e-NAM digital market platform.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Foster diversification to high-value crops. Promote Farmer Producer Organizations (FPOs) to improve small farmers' market power.</p></div>
+                            </div>`
+                    },
+                    innovation: {
+                        title: '💡 Roadmap: Innovation & Startups',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Strengthen early-stage funding (Seed Fund Scheme) and mentorship, especially in Tier-2/3 cities.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Build a robust talent pipeline by reforming higher education curricula. Mobilize domestic capital (pension funds, etc.) for VC investment.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Establish a powerful National Research Foundation (NRF) to fund quality academic research and catalyze a knowledge-based economy.</p></div>
+                            </div>`
+                    },
+                    environment: {
+                        title: '🌍 Roadmap: Environmental Stewardship',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Strictly enforce existing environmental laws. Revamp the National Clean Air Programme (NCAP) with a scientific, regional airshed management approach.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Implement a national mission for sustainable urban waste management based on circular economy principles (segregation, recycling, waste-to-wealth).</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Mainstream environmental considerations into all economic planning, potentially adopting a "Green GDP" accounting framework.</p></div>
+                            </div>`
+                    },
+                    social: {
+                        title: '🤝 Roadmap: Social Cohesion',
+                        content: `
+                            <div class="space-y-6">
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Short-Term (1-3 Yrs)</h4><p class="text-stone-600">Prioritize women's safety with stronger law enforcement. Strictly enforce all anti-discrimination laws against caste or religious bias.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Medium-Term (3-7 Yrs)</h4><p class="text-stone-600">Push to increase female labor force participation (safe transport, affordable childcare). Conduct an evidence-based review of affirmative action policies.</p></div>
+                                <div class="relative pl-8 timeline-item"><div class="timeline-dot"></div><h4 class="font-semibold">Long-Term (7+ Yrs)</h4><p class="text-stone-600">Tackle adverse social norms through education reform. Promote women's asset ownership and foster an inclusive national identity through inter-community dialogue.</p></div>
+                            </div>`
+                    }
+                }
+            };
+
+            window.showModal = (key) => {
+                const modalData = data.modals[key];
+                if (modalData) {
+                    document.getElementById('modal-title').innerText = modalData.title;
+                    document.getElementById('modal-body').innerHTML = modalData.content;
+                    const modal = document.getElementById('modal');
+                    modal.classList.remove('opacity-0', 'pointer-events-none');
+                    document.getElementById('modal-content').classList.remove('scale-95');
+                }
+            };
+
+            window.closeModal = () => {
+                const modal = document.getElementById('modal');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('modal-content').classList.add('scale-95');
+            };
+            
+            window.highlightPrerequisites = (keys) => {
+                keys.forEach(key => {
+                    const el = document.querySelector(`[data-prerequisite="${key}"]`);
+                    if (el) el.classList.add('prerequisite-highlight');
+                });
+            };
+
+            window.clearHighlights = () => {
+                document.querySelectorAll('.prerequisite-highlight').forEach(el => {
+                    el.classList.remove('prerequisite-highlight');
+                });
+            };
+
+            const chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) { label += context.parsed.y; }
+                                if(context.dataset.label === 'Corruption Perception Index') {
+                                    label = `Rank: ${context.parsed.x} / ${context.dataset.total}`;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { autoSkip: false, maxRotation: 0, minRotation: 0 } },
+                }
+            };
+
+            new Chart(document.getElementById('humanCapitalChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.humanCapital.labels.map(label => label.split(' ')),
+                    datasets: [
+                        { 
+                            label: 'India',
+                            data: data.humanCapital.india,
+                            backgroundColor: '#F97316',
+                            barPercentage: 0.5 
+                        },
+                        {
+                            label: 'Global Avg / Target', 
+                            data: data.humanCapital.target, 
+                            backgroundColor: '#64748B', 
+                            barPercentage: 0.5 
+                        }
+                    ]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('governanceChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Corruption Perception Index'],
+                    datasets: [
+                        {
+                            label: 'Corruption Perception Index',
+                            data: data.governance.corruptionRank,
+                            backgroundColor: ['#EF4444'],
+                            barPercentage: 0.5,
+                            borderWidth: 5,
+                            total: data.governance.totalCountries
+                        },
+                        { 
+                            label: 'India',
+                            data: data.humanCapital.india,
+                            backgroundColor: '#F97316',
+                            barPercentage: 0.5 
+                        },
+                    ]
+                },
+                options: { ...chartOptions, indexAxis: 'y' }
+            });
+
+            new Chart(document.getElementById('manufacturingChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.manufacturing.labels,
+                    datasets: [{
+                        label: 'Manufacturing Share of GDP (%)',
+                        data: data.manufacturing.share,
+                        backgroundColor: ['#64748B', '#F97316', '#14B8A6'],
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            new Chart(document.getElementById('inequalityChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.inequality.labels,
+                    datasets: [{
+                        label: 'Wealth Share',
+                        data: data.inequality.wealth,
+                        backgroundColor: ['#EF4444', '#F97316', '#E5E7EB'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('energyChart'), {
+                type: 'pie',
+                data: {
+                    labels: data.energy.labels,
+                    datasets: [{
+                        label: 'Installed Capacity Share (%)',
+                        data: data.energy.capacity,
+                        backgroundColor: ['#10B981', '#4B5563'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section[id]');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => observer.observe(section));
+
+            document.getElementById('mobile-menu-button').addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

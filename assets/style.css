@@ -1,0 +1,77 @@
+/* Custom CSS for theming, fonts, and advanced styling */
+:root {
+    /* Light Theme Variables */
+    --bg-color: #f4f7f9;
+    --card-bg: #ffffff;
+    --text-color: #1a202c;
+    --subtext-color: #4a5568;
+    --accent-color: #4f46e5;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+    /* Dark Theme Variables */
+    --bg-color: #1a202c;
+    --card-bg: #2d3748;
+    --text-color: #e2e8f0;
+    --subtext-color: #a0aec0;
+    --accent-color: #818cf8;
+    --border-color: #4a5568;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Component Styles using variables */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
+}
+
+.section-title {
+    color: var(--text-color);
+    transition: color 0.4s ease;
+}
+
+.search-bar {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+.search-bar:focus {
+    box-shadow: 0 0 0 3px var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* For the animated theme toggle icon */
+#theme-toggle .fa-sun {
+    display: none;
+}
+.dark #theme-toggle .fa-sun {
+    display: inline-block;
+}
+.dark #theme-toggle .fa-moon {
+    display: none;
+}
+.theme-icon {
+    transform-origin: center center;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+#theme-toggle:hover .theme-icon {
+    transform: rotate(360deg) scale(1.2);
+}

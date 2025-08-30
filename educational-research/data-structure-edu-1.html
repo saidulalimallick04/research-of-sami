@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Data Structures Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Dev Tones -->
+    <!-- Application Structure Plan: A two-column layout with a fixed sidebar for navigation and a main content area. This structure is intuitive for educational content, allowing users to easily jump between topics. The main content is divided into thematic sections for each data structure, each containing an explanation, an interactive visualization, and a performance summary. This modular approach breaks down complex information into digestible chunks, promoting focused learning. The user flow is non-linear; a user can explore topics in any order via the sidebar, or scroll sequentially. An interactive comparison chart at the end synthesizes the performance data, allowing users to compare structures based on specific operations, which is a key task for developers choosing a data structure. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core data structures (Arrays, Lists, Stacks, etc.). Goal: Explain concepts. Viz: Interactive HTML/CSS diagrams. Interaction: Buttons to add/remove elements, visually demonstrating operations. Justification: Kinesthetic learning helps solidify abstract concepts. Method: Vanilla JS DOM manipulation.
+        - Report Info: Big O complexity for each structure. Goal: Compare performance. Viz: Bar Chart. Interaction: Buttons to filter chart by operation (Access, Search, Insert, Delete). Justification: A chart provides a quick, visual comparison that is more effective than a table for identifying patterns. Method: Chart.js library.
+        - Report Info: Hierarchical nature of Trees. Goal: Show parent-child relationships. Viz: HTML nodes connected by CSS pseudo-elements. Interaction: Highlighting nodes on hover/click. Justification: A visual tree is essential for understanding this structure. Pure CSS is used to avoid external graphics and keep it lightweight and the connections are now properly rendered. Method: HTML/CSS.
+        - Report Info: LIFO/FIFO principles. Goal: Demonstrate Stacks and Queues. Viz: Vertical (Stack) and Horizontal (Queue) containers. Interaction: Animated push/pop/enqueue/dequeue actions. Justification: Animation makes the access restrictions (front/back) immediately obvious. Method: JS with CSS transitions.
+        - Report Info: Non-linear connections of Graphs. Goal: Show interconnected nodes. Viz: Simplified HTML/CSS diagram with nodes and connecting lines. Interaction: Nodes are selectable. Justification: A visual representation of nodes and relationships is critical for understanding graphs. The simplified CSS-based approach ensures the connections render correctly without complex, unreliable JS calculations. Method: HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #e9ecef;
+            border-left-color: #4f46e5;
+            color: #212529;
+            transform: translateX(4px);
+        }
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .content-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .ds-viz {
+            min-height: 200px;
+            border: 2px dashed #ced4da;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .ds-viz-item {
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform-origin: bottom;
+            opacity: 1;
+            transform: scale(1);
+        }
+        .ds-viz-item.removing {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        .op-button {
+            transition: all 0.2s ease;
+        }
+        .op-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+        }
+        .op-button.active {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: none;
+        }
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+        .complexity-table th { background-color: #e9ecef; }
+        .complexity-best { color: #28a745; font-weight: 600; }
+        .complexity-avg { color: #ffc107; font-weight: 600; }
+        .complexity-worst { color: #dc3545; font-weight: 600; }
+        .tree-node-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tree-node-wrapper::before {
+            content: '';
+            position: absolute;
+            background-color: #6c757d;
+            z-index: 1;
+        }
+        .tree-node-wrapper:not(:first-child)::before {
+            top: -12px;
+            height: 12px;
+            width: 2px;
+        }
+        .tree-node-children {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        .tree-node-children::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #6c757d;
+            z-index: 0;
+        }
+        .tree-node {
+            position: relative;
+            z-index: 2;
+            padding: 8px 16px;
+            border: 2px solid #6c757d;
+            border-radius: 50%;
+            background-color: white;
+            transition: transform 0.2s ease;
+        }
+        .graph-node {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .graph-node::before {
+            content: attr(data-id);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .graph-node:hover::before { transform: translate(-50%, -50%) scale(1.1); }
+        .graph-node.connected::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 30px;
+            height: 2px;
+            background-color: #6c757d;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="flex flex-col md:flex-row min-h-screen">
+    <aside id="sidebar" class="w-full md:w-64 bg-white md:border-r border-b md:border-b-0 border-gray-200 md:fixed md:h-full top-0 left-0 z-20">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-gray-800">Data Structures</h1>
+            <p class="text-sm text-gray-500 mt-1">An Interactive Guide</p>
+        </div>
+        <nav class="mt-2 flex-1 px-4">
+            <a href="#introduction" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">👋</span> Introduction
+            </a>
+            <a href="#array" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">📦</span> Arrays
+            </a>
+            <a href="#linked-list" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">🔗</span> Linked Lists
+            </a>
+            <a href="#stack" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">📚</span> Stacks
+            </a>
+            <a href="#queue" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg"> FIFO </span> Queues
+            </a>
+            <a href="#hash-table" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">🔑</span> Hash Tables
+            </a>
+            <a href="#tree" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">🌳</span> Trees
+            </a>
+            <a href="#graph" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">🌐</span> Graphs
+            </a>
+            <a href="#comparison" class="sidebar-link group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-600">
+                <span class="mr-3 text-lg">📊</span> Performance
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 md:ml-64 p-4 md:p-8 lg:p-12">
+
+        <section id="introduction" class="mb-16">
+            <div class="content-card rounded-xl p-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to the Interactive Data Structures Guide</h2>
+                <p class="text-gray-600 leading-relaxed">This guide is designed to help you visually understand how different data structures work. In computer science, a data structure is a way of organizing and storing data so that it can be accessed and modified efficiently. Choosing the right data structure is crucial for creating high-performance applications. Use the sidebar to navigate through the different structures. Each section provides an explanation, an interactive visualization, and a summary of its performance characteristics. Explore, experiment, and solidify your understanding!</p>
+            </div>
+        </section>
+
+        <div id="ds-content">
+            <section id="array" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">📦 Array</h3>
+                    <p class="text-gray-600 mb-6">An array is a collection of items stored at contiguous memory locations. The idea is to store multiple items of the same type together. This makes it easy to calculate the position of each element by simply adding an offset to a base value. Accessing an element by its index is very fast (O(1)), but adding or removing elements from the middle can be slow as it may require shifting other elements.</p>
+                    <div id="array-viz" class="ds-viz rounded-lg p-4 flex items-center justify-center space-x-1 my-4"></div>
+                    <div class="flex space-x-2 justify-center">
+                        <input id="array-value" type="text" placeholder="Value" class="border rounded-md px-2 py-1 w-24">
+                        <input id="array-index" type="number" placeholder="Index" class="border rounded-md px-2 py-1 w-20">
+                        <button id="array-add" class="op-button bg-indigo-500 text-white px-4 py-1 rounded-md">Set at Index</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="linked-list" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">🔗 Linked List</h3>
+                    <p class="text-gray-600 mb-6">A linked list is a linear data structure where elements are not stored at contiguous memory locations. The elements in a linked list are linked using pointers. Each element (a node) consists of two parts: the data and a reference (or pointer) to the next node in the sequence. Insertion and deletion are efficient, but accessing an element requires traversing the list from the beginning, which is slower than an array.</p>
+                    <div id="linked-list-viz" class="ds-viz rounded-lg p-4 flex items-center justify-center space-x-8 my-4"></div>
+                    <div class="flex space-x-2 justify-center">
+                        <input id="linked-list-value" type="text" placeholder="Value" class="border rounded-md px-2 py-1 w-24">
+                        <button id="linked-list-add" class="op-button bg-green-500 text-white px-4 py-1 rounded-md">Add Node</button>
+                        <button id="linked-list-remove" class="op-button bg-red-500 text-white px-4 py-1 rounded-md">Remove Last</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="stack" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">📚 Stack (LIFO)</h3>
+                    <p class="text-gray-600 mb-6">A stack is a linear data structure that follows a particular order in which the operations are performed. The order is Last-In, First-Out (LIFO). Think of it like a stack of plates: you add new plates to the top, and you also remove plates from the top. The primary operations are `push` (add to top) and `pop` (remove from top).</p>
+                    <div id="stack-viz" class="ds-viz rounded-lg p-4 flex flex-col-reverse items-center justify-start space-y-2 space-y-reverse my-4"></div>
+                    <div class="flex space-x-2 justify-center">
+                        <input id="stack-value" type="text" placeholder="Value" class="border rounded-md px-2 py-1 w-24">
+                        <button id="stack-push" class="op-button bg-green-500 text-white px-4 py-1 rounded-md">Push</button>
+                        <button id="stack-pop" class="op-button bg-red-500 text-white px-4 py-1 rounded-md">Pop</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="queue" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4"> FIFO  Queue (FIFO)</h3>
+                    <p class="text-gray-600 mb-6">A queue is a linear structure which follows a particular order in which the operations are performed. The order is First-In, First-Out (FIFO), like a checkout line at a store. The first person in line is the first person to be served. The primary operations are `enqueue` (add to the back) and `dequeue` (remove from the front).</p>
+                    <div id="queue-viz" class="ds-viz rounded-lg p-4 flex items-center justify-start space-x-2 my-4"></div>
+                     <div class="flex space-x-2 justify-center">
+                        <input id="queue-value" type="text" placeholder="Value" class="border rounded-md px-2 py-1 w-24">
+                        <button id="queue-enqueue" class="op-button bg-green-500 text-white px-4 py-1 rounded-md">Enqueue</button>
+                        <button id="queue-dequeue" class="op-button bg-red-500 text-white px-4 py-1 rounded-md">Dequeue</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="hash-table" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">🔑 Hash Table</h3>
+                    <p class="text-gray-600 mb-6">A hash table is a data structure that implements an associative array abstract data type, a structure that can map keys to values. It uses a hash function to compute an index, also called a hash code, into an array of buckets or slots, from which the desired value can be found. On average, this allows for near-constant time access, insertion, and deletion. However, performance can degrade if many keys hash to the same bucket (a "collision").</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
+                        <div id="hash-table-viz" class="ds-viz rounded-lg p-4"></div>
+                        <div class="flex flex-col justify-center">
+                            <input id="hash-key" type="text" placeholder="Enter a key" class="border rounded-md px-3 py-2 mb-2">
+                             <input id="hash-value" type="text" placeholder="Enter a value" class="border rounded-md px-3 py-2 mb-2">
+                            <button id="hash-insert" class="op-button bg-indigo-500 text-white px-4 py-2 rounded-md mb-4">Insert Key-Value</button>
+                            <p class="text-center">Hashed Index: <span id="hash-output" class="font-mono font-bold text-xl text-indigo-600">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tree" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">🌳 Tree (Binary Search Tree)</h3>
+                    <p class="text-gray-600 mb-6">A tree is a hierarchical data structure with a root value and subtrees of children with a parent node, represented as a set of linked nodes. A Binary Search Tree (BST) is a special type where for each node, all values in its left subtree are lesser, and all values in its right subtree are greater. This property makes searching, insertion, and deletion very efficient.</p>
+                    <div id="tree-viz" class="ds-viz rounded-lg p-8 my-4 flex justify-center items-center overflow-x-auto">
+                        <div class="tree-node-wrapper">
+                            <div class="tree-node">50</div>
+                            <div class="tree-node-children">
+                                <div class="tree-node-wrapper">
+                                    <div class="tree-node">30</div>
+                                    <div class="tree-node-children">
+                                        <div class="tree-node-wrapper">
+                                            <div class="tree-node">20</div>
+                                        </div>
+                                        <div class="tree-node-wrapper">
+                                            <div class="tree-node">40</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tree-node-wrapper">
+                                    <div class="tree-node">70</div>
+                                    <div class="tree-node-children">
+                                        <div class="tree-node-wrapper">
+                                            <div class="tree-node">60</div>
+                                        </div>
+                                        <div class="tree-node-wrapper">
+                                            <div class="tree-node">80</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="graph" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">🌐 Graph</h3>
+                    <p class="text-gray-600 mb-6">A graph is a non-linear data structure consisting of nodes (or vertices) and edges that connect pairs of nodes. Unlike trees, graphs can have cycles and disconnected components. They are used to model networks, such as social networks, road maps, or the internet. Operations include adding nodes/edges and traversing the graph to find paths.</p>
+                    <div id="graph-viz" class="ds-viz rounded-lg p-8 my-4 flex justify-center items-center">
+                        <div class="flex items-center">
+                            <div class="graph-node" data-id="A"></div>
+                            <div class="graph-node connected" data-id="B"></div>
+                            <div class="graph-node" data-id="C"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="comparison" class="mb-12">
+                <div class="content-card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">📊 Performance Comparison (Big O Notation)</h3>
+                    <p class="text-gray-600 mb-6">Big O notation is used to describe the performance or complexity of an algorithm. It specifically describes the worst-case scenario and can be used to describe the execution time required or the space used (e.g., in memory or on disk) by an algorithm. Below, you can compare the average time complexities for common operations across different data structures. Click the buttons to change the operation being compared.</p>
+                    <div class="flex flex-wrap justify-center gap-2 mb-6" id="chart-controls">
+                        <button data-op="access" class="op-button active bg-gray-200 text-gray-800 px-4 py-2 rounded-md">Access</button>
+                        <button data-op="search" class="op-button bg-gray-200 text-gray-800 px-4 py-2 rounded-md">Search</button>
+                        <button data-op="insertion" class="op-button bg-gray-200 text-gray-800 px-4 py-2 rounded-md">Insertion</button>
+                        <button data-op="deletion" class="op-button bg-gray-200 text-gray-800 px-4 py-2 rounded-md">Deletion</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="complexityChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    const sections = document.querySelectorAll('main section');
+    const chartControls = document.getElementById('chart-controls');
+    
+    let complexityChart;
+
+    const dsData = {
+        'Array':        { access: 1, search: 'n', insertion: 'n', deletion: 'n' },
+        'Stack':        { access: 'n', search: 'n', insertion: 1, deletion: 1 },
+        'Queue':        { access: 'n', search: 'n', insertion: 1, deletion: 1 },
+        'Linked List':  { access: 'n', search: 'n', insertion: 1, deletion: 1 },
+        'Hash Table':   { access: 'n/a', search: 1, insertion: 1, deletion: 1 },
+        'BST':          { access: 'log(n)', search: 'log(n)', insertion: 'log(n)', deletion: 'log(n)' }
+    };
+
+    function bigOToNumber(val) {
+        if (typeof val === 'number') return val;
+        if (val === 'log(n)') return 2;
+        if (val === 'n') return 3;
+        return 0;
+    }
+    
+    function createComplexityChart(operation) {
+        const ctx = document.getElementById('complexityChart').getContext('2d');
+        const labels = Object.keys(dsData);
+        const data = labels.map(label => bigOToNumber(dsData[label][operation]));
+        
+        const backgroundColors = data.map(d => {
+            if (d === 1) return 'rgba(75, 192, 192, 0.6)';
+            if (d === 2) return 'rgba(255, 206, 86, 0.6)';
+            if (d === 3) return 'rgba(255, 99, 132, 0.6)';
+            return 'rgba(201, 203, 207, 0.6)';
+        });
+
+        const borderColors = data.map(d => {
+            if (d === 1) return 'rgba(75, 192, 192, 1)';
+            if (d === 2) return 'rgba(255, 206, 86, 1)';
+            if (d === 3) return 'rgba(255, 99, 132, 1)';
+            return 'rgba(201, 203, 207, 1)';
+        });
+
+        if (complexityChart) {
+            complexityChart.destroy();
+        }
+
+        complexityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `Average Time Complexity for ${operation.charAt(0).toUpperCase() + operation.slice(1)}`,
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                switch(value) {
+                                    case 1: return 'O(1)';
+                                    case 2: return 'O(log n)';
+                                    case 3: return 'O(n)';
+                                    default: return '';
+                                }
+                            },
+                           font: { size: 14 }
+                        }
+                    },
+                    x: {
+                       ticks: { font: { size: 14 } }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: `Time Complexity: ${operation.charAt(0).toUpperCase() + operation.slice(1)}`,
+                        font: { size: 18, weight: 'bold' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const rawValue = context.raw;
+                                let label = '';
+                                switch(rawValue) {
+                                    case 1: label = 'O(1) - Constant'; break;
+                                    case 2: label = 'O(log n) - Logarithmic'; break;
+                                    case 3: label = 'O(n) - Linear'; break;
+                                    default: label = 'N/A';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    chartControls.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const operation = e.target.dataset.op;
+            if (operation) {
+                chartControls.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                createComplexityChart(operation);
+            }
+        }
+    });
+    
+    createComplexityChart('access');
+
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === entry.target.id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+    
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href');
+            document.querySelector(targetId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    function createVizItem(value) {
+        const item = document.createElement('div');
+        item.className = 'ds-viz-item bg-indigo-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-lg font-bold shadow-md';
+        item.textContent = value;
+        return item;
+    }
+    
+    function createLLNode(value) {
+        const container = document.createElement('div');
+        container.className = 'flex items-center';
+
+        const node = document.createElement('div');
+        node.className = 'ds-viz-item bg-green-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-lg font-bold shadow-md';
+        node.textContent = value;
+        container.appendChild(node);
+        
+        const arrow = document.createElement('div');
+        arrow.className = 'text-3xl text-gray-400 mx-2 -mb-1';
+        arrow.textContent = '→';
+        container.appendChild(arrow);
+        
+        return container;
+    }
+
+    const arrayViz = document.getElementById('array-viz');
+    let arrayData = Array(5).fill(null);
+
+    function renderArray() {
+        arrayViz.innerHTML = '';
+        arrayData.forEach((val, index) => {
+            const item = document.createElement('div');
+            item.className = 'w-16 h-16 border-2 border-gray-400 flex flex-col items-center justify-center bg-gray-100 rounded';
+            const valEl = document.createElement('span');
+            valEl.className = 'font-bold text-lg';
+            valEl.textContent = val === null ? '' : val;
+            const indexEl = document.createElement('span');
+            indexEl.className = 'text-xs text-gray-500';
+            indexEl.textContent = `[${index}]`;
+            item.appendChild(valEl);
+            item.appendChild(indexEl);
+            arrayViz.appendChild(item);
+        });
+    }
+    
+    document.getElementById('array-add').addEventListener('click', () => {
+        const value = document.getElementById('array-value').value;
+        const index = parseInt(document.getElementById('array-index').value);
+        if (value && !isNaN(index) && index >= 0 && index < arrayData.length) {
+            arrayData[index] = value;
+            renderArray();
+        }
+    });
+
+    const llViz = document.getElementById('linked-list-viz');
+    document.getElementById('linked-list-add').addEventListener('click', () => {
+        const value = document.getElementById('linked-list-value').value || Math.floor(Math.random() * 100);
+        if (llViz.children.length < 5) {
+            llViz.appendChild(createLLNode(value));
+        }
+    });
+    document.getElementById('linked-list-remove').addEventListener('click', () => {
+        if (llViz.lastChild) {
+            llViz.lastChild.classList.add('removing');
+            setTimeout(() => llViz.removeChild(llViz.lastChild), 500);
+        }
+    });
+
+    const stackViz = document.getElementById('stack-viz');
+    document.getElementById('stack-push').addEventListener('click', () => {
+        const value = document.getElementById('stack-value').value || Math.floor(Math.random() * 100);
+        if (stackViz.children.length < 5) {
+            stackViz.prepend(createVizItem(value));
+        }
+    });
+    document.getElementById('stack-pop').addEventListener('click', () => {
+        if (stackViz.firstChild) {
+            stackViz.firstChild.classList.add('removing');
+            setTimeout(() => stackViz.removeChild(stackViz.firstChild), 500);
+        }
+    });
+
+    const queueViz = document.getElementById('queue-viz');
+    document.getElementById('queue-enqueue').addEventListener('click', () => {
+        const value = document.getElementById('queue-value').value || Math.floor(Math.random() * 100);
+        if (queueViz.children.length < 8) {
+             queueViz.appendChild(createVizItem(value));
+        }
+    });
+    document.getElementById('queue-dequeue').addEventListener('click', () => {
+        if (queueViz.firstChild) {
+            queueViz.firstChild.classList.add('removing');
+            setTimeout(() => queueViz.removeChild(queueViz.firstChild), 500);
+        }
+    });
+
+    const hashViz = document.getElementById('hash-table-viz');
+    const hashOutput = document.getElementById('hash-output');
+    const hashSize = 7;
+    let hashTableData = Array(hashSize).fill(null).map(() => []);
+
+    function simpleHash(key) {
+        let hash = 0;
+        for (let i = 0; i < key.length; i++) {
+            hash = (hash + key.charCodeAt(i) * (i + 1)) % hashSize;
+        }
+        return hash;
+    }
+
+    function renderHashTable() {
+        hashViz.innerHTML = '';
+        hashTableData.forEach((bucket, index) => {
+            const bucketEl = document.createElement('div');
+            bucketEl.className = 'flex items-center mb-1';
+            const indexEl = document.createElement('div');
+            indexEl.className = 'w-8 h-8 bg-gray-300 flex items-center justify-center font-mono rounded-l-md';
+            indexEl.textContent = index;
+            bucketEl.appendChild(indexEl);
+            
+            const chainEl = document.createElement('div');
+            chainEl.className = 'flex-1 border border-gray-300 h-8 flex items-center space-x-1 p-1 rounded-r-md';
+            bucket.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'bg-blue-400 text-white text-xs px-1 rounded-sm flex-shrink-0';
+                itemEl.textContent = `${item.key}:${item.value}`;
+                chainEl.appendChild(itemEl);
+            });
+            bucketEl.appendChild(chainEl);
+            hashViz.appendChild(bucketEl);
+        });
+    }
+    
+    document.getElementById('hash-insert').addEventListener('click', () => {
+        const key = document.getElementById('hash-key').value;
+        const value = document.getElementById('hash-value').value;
+        if (key && value) {
+            const index = simpleHash(key);
+            hashOutput.textContent = index;
+            const bucket = hashTableData[index];
+            const existing = bucket.find(item => item.key === key);
+            if(existing) {
+                existing.value = value;
+            } else {
+                bucket.push({key, value});
+            }
+            renderHashTable();
+            
+            const bucketEls = hashViz.children;
+            if (bucketEls[index]) {
+                bucketEls[index].style.transition = 'all 0.2s ease';
+                bucketEls[index].style.transform = 'scale(1.05)';
+                bucketEls[index].style.backgroundColor = '#dbeafe';
+                setTimeout(() => {
+                    bucketEls[index].style.transform = 'scale(1)';
+                    bucketEls[index].style.backgroundColor = 'transparent';
+                }, 500);
+            }
+        }
+    });
+
+    renderArray();
+    renderHashTable();
+});
+
+</script>
+</body>
+</html>
